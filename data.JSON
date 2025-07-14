@@ -1,0 +1,26 @@
+[
+  {
+    "semestre": 1,
+    "nombre": "Introducción a la medicina veterinaria",
+    "prerrequisitos": [],
+    "estado": "pendiente"
+  },
+  {
+    "semestre": 1,
+    "nombre": "Biología celular",
+    "prerrequisitos": [],
+    "estado": "pendiente"
+  },
+  {
+    "semestre": 2,
+    "nombre": "Bioquímica",
+    "prerrequisitos": ["Química"],
+    "estado": "pendiente"
+  },
+  {
+    "semestre": 2,
+    "nombre": "Fisiología animal",
+    "prerrequisitos": ["Anatomía del canino", "Bioquímica"],
+    "estado": "pendiente"
+  }
+]
