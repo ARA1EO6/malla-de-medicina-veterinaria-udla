@@ -1,5 +1,4 @@
 let data = [];
-let aprobadas = [];
 
 function cargarDatos() {
   fetch("data.json")
@@ -7,13 +6,16 @@ function cargarDatos() {
     .then(json => {
       data = json;
       renderMalla();
+    })
+    .catch(error => {
+      console.error("Error cargando data.json:", error);
     });
 }
 
 function cambiarEstado(nombre) {
   const ramo = data.find(r => r.nombre === nombre);
-  if (ramo.estado === "pendiente") ramo.estado = "aprobado";
-  else if (ramo.estado === "aprobado") ramo.estado = "pendiente";
+  if (!ramo) return;
+  ramo.estado = ramo.estado === "aprobado" ? "pendiente" : "aprobado";
   renderMalla();
 }
 
@@ -30,18 +32,27 @@ function renderMalla() {
 
     const ramos = data.filter(r => r.semestre === sem);
     ramos.forEach(ramo => {
-      const requisitosOK = ramo.prerrequisitos.every(pr => data.find(r => r.nombre === pr && r.estado === "aprobado"));
-      const estado = ramo.estado === "aprobado" ? "aprobado" : requisitosOK ? "disponible" : "pendiente";
+      // Manejo seguro de prerrequisitos
+      const prerrequisitos = ramo.prerrequisitos || [];
+      const requisitosOK = prerrequisitos.every(pr =>
+        data.find(r => r.nombre === pr && r.estado === "aprobado")
+      );
+      let estado;
+      if (ramo.estado === "aprobado") estado = "aprobado";
+      else if (requisitosOK) estado = "disponible";
+      else estado = "pendiente";
 
       const div = document.createElement("div");
       div.className = `ramo ${estado}`;
       div.innerHTML = `
         <strong>${ramo.nombre}</strong><br>
-        <em>Prerrequisitos: ${ramo.prerrequisitos.join(", ") || "Ninguno"}</em><br>
-        <button onclick="cambiarEstado('${ramo.nombre}')">
-          ${estado === "aprobado" ? "Marcar como pendiente" : "Marcar como aprobado"}
-        </button>
+        <em>Prerrequisitos: ${prerrequisitos.join(", ") || "Ninguno"}</em><br>
       `;
+      const btn = document.createElement("button");
+      btn.textContent = estado === "aprobado" ? "Marcar como pendiente" : "Marcar como aprobado";
+      btn.onclick = () => cambiarEstado(ramo.nombre);
+      div.appendChild(btn);
+
       container.appendChild(div);
     });
 
@@ -49,4 +60,5 @@ function renderMalla() {
   });
 }
 
+// Ejecutar al cargar la página
 cargarDatos();
