@@ -1,0 +1,27 @@
+fetch("data/malla.json")
+  .then(response => response.json())
+  .then(data => {
+    const container = document.getElementById("malla-container");
+    const semestres = {};
+
+    data.forEach(ramo => {
+      if (!semestres[ramo.semestre]) {
+        semestres[ramo.semestre] = [];
+      }
+      semestres[ramo.semestre].push(ramo);
+    });
+
+    for (let semestre in semestres) {
+      const div = document.createElement("div");
+      div.innerHTML = `<h2>Semestre ${semestre}</h2>`;
+      semestres[semestre].forEach(ramo => {
+        const estadoColor = ramo.estado === "aprobado" ? "green" : ramo.estado === "disponible" ? "orange" : "gray";
+        div.innerHTML += `<div style="border:1px solid #ccc; padding:10px; margin:5px;">
+          <strong>${ramo.asignatura}</strong><br>
+          <em>Prerrequisitos: ${ramo.prerrequisitos.length > 0 ? ramo.prerrequisitos.join(", ") : "Ninguno"}</em><br>
+          <span style="color:${estadoColor}">Estado: ${ramo.estado}</span>
+        </div>`;
+      });
+      container.appendChild(div);
+    }
+  });
